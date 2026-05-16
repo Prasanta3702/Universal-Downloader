@@ -5,14 +5,21 @@ public class Quality {
 	private String formatId;
 	private String extension;
 	private String resolution;
+	private String resolutionValue;
 	private String fileSize;
 	private String note;
+	
+	public Quality() {
+		super();
+	}
 
-	public Quality(String formatId, String extension, String resolution, String fileSize, String note) {
+	public Quality(String formatId, String extension, String resolution, String resolutionValue, String fileSize,
+			String note) {
 
 		this.formatId = formatId;
 		this.extension = extension;
 		this.resolution = resolution;
+		this.resolutionValue = resolutionValue;
 		this.fileSize = fileSize;
 		this.note = note;
 	}
@@ -27,6 +34,10 @@ public class Quality {
 
 	public String getResolution() {
 		return resolution;
+	}
+
+	public String getResolutionValue() {
+		return resolutionValue;
 	}
 
 	public String getFileSize() {
