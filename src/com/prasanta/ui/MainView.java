@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -38,7 +39,7 @@ public class MainView extends JFrame {
 	private final JButton downloadButton = new JButton("Download");
 	private final JButton cancelButton = new JButton("Cancel");
 
-	private AppMenuBar appMenuBar = new AppMenuBar();
+	private AppMenuBar appMenuBar = new AppMenuBar(this);
 
 	public MainView() {
 		this.setTitle(TITLE);
@@ -47,6 +48,11 @@ public class MainView extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setJMenuBar(appMenuBar);
 		this.setResizable(false);
+		this.setIconImage(
+		        new ImageIcon(
+		                getClass().getResource("/assets/download-icon.png")
+		        ).getImage()
+		);
 
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 		mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));

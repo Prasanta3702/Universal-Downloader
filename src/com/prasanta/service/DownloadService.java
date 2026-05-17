@@ -18,7 +18,7 @@ public class DownloadService {
 
 		try {
 
-			ProcessBuilder pb = new ProcessBuilder("lib/yt-dlp.exe", "-F", request.getUrl());
+			ProcessBuilder pb = new ProcessBuilder("yt-dlp.exe", "-F", request.getUrl());
 
 			pb.redirectErrorStream(true);
 
@@ -65,7 +65,7 @@ public class DownloadService {
 	public void download(DownloadRequest request, Consumer<Integer> progressListener) {
 
 		try {
-			ProcessBuilder pb = new ProcessBuilder("lib/yt-dlp.exe", "-P", request.getOutputPath(), "-f",
+			ProcessBuilder pb = new ProcessBuilder("yt-dlp.exe", "-P", request.getOutputPath(), "-f",
 					request.getQuality(), request.getUrl());
 
 			pb.redirectErrorStream(true);
