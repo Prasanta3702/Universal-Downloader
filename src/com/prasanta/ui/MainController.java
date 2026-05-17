@@ -10,7 +10,6 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
-import javax.swing.JPanel;
 
 import com.prasanta.controller.DownloadController;
 import com.prasanta.model.DownloadRequest;
@@ -28,16 +27,6 @@ public class MainController {
 	public MainController(MainView mainView) {
 		this.mainView = mainView;
 
-		qualities.add(new Quality("123", "mp4", "1920x1080", "720P", "100MB", "Video 1"));
-		qualities.add(new Quality("124", "mp4", "1280x720", "1080P", "70MB", "Video 2"));
-		qualities.add(new Quality("125", "mp4", "1280x720", "1080P", "70MB", "Video 2"));
-		qualities.add(new Quality("126", "mp4", "1280x720", "1080P", "70MB", "Video 2"));
-		qualities.add(new Quality("127", "mp4", "1280x720", "1080P", "70MB", "Video 2"));
-		qualities.add(new Quality("128", "mp4", "1280x720", "1080P", "70MB", "Video 2"));
-		qualities.add(new Quality("129", "mp4", "1280x720", "1080P", "70MB", "Video 2"));
-		qualities.add(new Quality("130", "mp4", "1280x720", "1080P", "70MB", "Video 2"));
-		qualities.add(new Quality("131", "mp4", "1280x720", "1080P", "70MB", "Video 2"));
-
 		mainView.getOutputField().setText(getDownloadPath());
 
 		mainView.getSendButton().addActionListener(e -> onSend());
@@ -49,26 +38,22 @@ public class MainController {
 
 	private void onSend() {
 		if (!mainView.getUrlField().getText().isBlank()) {
-			mainView.getLoadingProgress().setIndeterminate(true);
-			mainView.getLoadingProgress().revalidate();
 
 			DownloadRequest request = new DownloadRequest();
 			request.setUrl(mainView.getUrlField().getText());
 
-			try {
-				qualities.clear();
-				List<Quality> fetchQualities = controller.fetchQuality(request);
-				qualities.addAll(fetchQualities);
+			// Remove all elements from list
+			qualities.clear();
+			mainView.getQualityScrollPanel().removeAll();
+			mainView.getQualityScrollPanel().revalidate();
+
+			controller.fetchQuality(request, mainView.getLoadingProgress(), qualities -> {
+
 				audioQuality = qualities.stream().filter(q -> q.getResolution().toLowerCase().contains("audio")
 						&& q.getExtension().equalsIgnoreCase("m4a")).findFirst().orElse(null);
 
-				loadQualities(mainView.getQualityScrollPanel());
-
-			} catch (Exception ignored) {
-			} finally {
-				mainView.getLoadingProgress().setIndeterminate(false);
-				mainView.getLoadingProgress().revalidate();
-			}
+				loadQualities(qualities);
+			});
 		}
 	}
 
@@ -122,26 +107,32 @@ public class MainController {
 		this.selectedQuality = quality;
 	}
 
-	public void loadQualities(JPanel qualityScrollPanel) {
+	public void loadQualities(List<Quality> qualities) {
+		int i = 1;
 		for (Quality quality : qualities) {
-			String text = String.format("%-20s | %-20s | %-20s | %-10s", quality.getResolution(),
+
+			String text = String.format("%-15.15s | %-20.20s | %-20.20s | %-10.10s", quality.getResolution(),
 					quality.getResolutionValue(), quality.getExtension(), quality.getFileSize());
-			JCheckBox qualityCheckbox = getQualityCheckbox(text);
+
+			JCheckBox qualityCheckbox = new JCheckBox(text);
+			qualityCheckbox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 20));
+			qualityCheckbox.setPreferredSize(new Dimension(0, 20));
+			qualityCheckbox.setBorder(BorderFactory.createLineBorder(Color.red));
+			if (i % 2 == 0) {
+				qualityCheckbox.setBackground(new Color(220, 220, 220));
+			} else {
+				qualityCheckbox.setOpaque(false);
+			}
+
 			qualityCheckbox.addActionListener(e -> onQualitySelect(quality));
+
 			qualityGroup.add(qualityCheckbox);
-			qualityScrollPanel.add(qualityCheckbox);
+
+			mainView.getQualityScrollPanel().add(qualityCheckbox);
+			i++;
 		}
 
-		qualityScrollPanel.revalidate();
-	}
-
-	private JCheckBox getQualityCheckbox(String title) {
-		JCheckBox checkbox = new JCheckBox(title);
-		checkbox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 20));
-		checkbox.setPreferredSize(new Dimension(100, 20));
-		checkbox.setBorder(BorderFactory.createLineBorder(Color.lightGray));
-		checkbox.setOpaque(false);
-		return checkbox;
+		mainView.getQualityScrollPanel().revalidate();
 	}
 
 	private String getDownloadPath() {

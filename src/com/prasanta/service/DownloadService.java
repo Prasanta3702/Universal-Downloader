@@ -4,8 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.JProgressBar;
+import java.util.function.Consumer;
 
 import com.prasanta.model.DownloadRequest;
 import com.prasanta.model.Quality;
@@ -63,40 +62,41 @@ public class DownloadService {
 		return qualities;
 	}
 
-	public void download(DownloadRequest request, JProgressBar progressBar) {
+	public void download(DownloadRequest request, Consumer<Integer> progressListener) {
 
 		try {
 			ProcessBuilder pb = new ProcessBuilder("lib/yt-dlp.exe", "-P", request.getOutputPath(), "-f",
 					request.getQuality(), request.getUrl());
+
 			pb.redirectErrorStream(true);
 
 			process = pb.start();
+
 			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
 			String line;
 
 			while ((line = reader.readLine()) != null) {
-				System.out.println(line);
 
 				if (line.contains("%") && line.contains("of")) {
 					try {
 						String percentPart = line.substring(line.indexOf("]") + 1);
 						String percent = percentPart.trim().split("%")[0].trim();
-						double value = Double.parseDouble(percent);
-						int progressValue = (int) Math.round(value);
-						progressBar.setValue(progressValue);
-						progressBar.setString("Downloading: " + progressValue+"%");
+
+						int value = (int) Math.round(Double.parseDouble(percent));
+
+						progressListener.accept(value);
+
 					} catch (Exception ignored) {
 					}
 				}
 			}
 
-			int exitCode = process.waitFor();
-			System.out.println("Exit with code: " + exitCode);
+			process.waitFor();
 
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-
 	}
 
 	public void cancelDownload() {
