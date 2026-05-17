@@ -13,8 +13,6 @@ A lightweight desktop application for downloading videos and audio from supporte
 
 ## Screenshots
 
-Add screenshots here:
-
 <img width="609" height="442" alt="Screenshot 2026-05-17 152854" src="https://github.com/user-attachments/assets/1c643dc5-0706-4c1a-974f-c8ae555bf76f" />
 
 ## Installation
